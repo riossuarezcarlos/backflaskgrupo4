@@ -1,11 +1,5 @@
 from flask_restful import Resource, reqparse
-import boto3
 from models.product import ProductModel
-
-s3 = boto3.client('s3',
-aws_access_key_id = 'AKIAJE3GDYHJIKN5R3CA',
-aws_secret_access_key = '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'
-)
 
 BUCKET_NAME = 'imgflask'
 
