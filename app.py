@@ -23,7 +23,7 @@ from controllers.producttype import ProductTypeController, ProductTypesControlle
 app = Flask(__name__)
 CORS(app)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:123456@localhost/tiendavirtual';
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://x4kvh5za35254lsa:qhokt2eflmcfee9m@sp6xl8zoyvbumaa2.cbetxkdyhwsb.us-east-1.rds.amazonaws.com:3306/lb8cwbrcgy5fhx0u';
 
 api = Api(app=app)
 
