@@ -35,7 +35,7 @@ class LabelsController(Resource):
         except Exception as e:
             return{
                 'ok': False,
-                'message': 'Ocurrio un error: ' + e,
+                'message': 'Ocurrio un error: ' + str(e),
                 'content': None
             }, 500
 
