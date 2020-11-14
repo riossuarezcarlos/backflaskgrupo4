@@ -1,19 +1,5 @@
 from flask_restful import Resource, reqparse
-from flask import Flask, render_template, request
-from werkzeug.utils import secure_filename
-from werkzeug.datastructures import FileStorage
-
-import boto3
-
 from models.product import ProductModel
-
-s3 = boto3.client('s3',
-aws_access_key_id = 'AKIAJY3DK7BZYFXIHLFQ',
-aws_secret_access_key = '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'
-)
-
-ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png']
-BUCKET_NAME = 'imgflask'
 
 class ProductsController(Resource):
     parser = reqparse.RequestParser()
@@ -229,27 +215,3 @@ class ProductController(Resource):
                 'message' : 'No existe un producto con el id: ' + str(productId),
                 'content' : None
             }, 404
-
-class ProductImgController(Resource):
-    def post(self):
-        parse = reqparse.RequestParser()
-        parse.add_argument('file', type=FileStorage, location='files')
-        data = parse.parse_args()
-        print(data)
-        img = data['file']
-        
-        if img:
-            
-            filename = secure_filename(img.filename)
-            response = s3.upload_file(
-                Body=img,
-                Bucket = BUCKET_NAME,
-                Key = filename
-            ) 
-            print(response)
-            
-        return{
-            'ok' : True,
-            'message' : 'Upload Done'
-        }
-        
