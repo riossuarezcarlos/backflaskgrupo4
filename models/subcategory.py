@@ -8,6 +8,8 @@ class SubCategoryModel(db.Model):
 
     categoryId = db.Column(db.Integer, db.ForeignKey('t_category.categoryId'), nullable=False)
 
+    types = db.relationship('ProductTypeModel', backref='subcategory')
+
     def __init__(self, description, categoryId):
         self.subcategoryDesc = description
         self.categoryId = categoryId

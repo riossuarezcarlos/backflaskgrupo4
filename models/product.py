@@ -9,15 +9,19 @@ class ProductModel(db.Model):
     productStock = db.Column(db.Integer)
     state = db.Column(db.Boolean, default=True)
 
+    producttypeId = db.Column(db.Integer, db.ForeignKey('t_producttype.producttypeId'), nullable=False)
     markId = db.Column(db.Integer, db.ForeignKey('t_mark.markId'), nullable=False)
+    labelId = db.Column(db.Integer, db.ForeignKey('t_label.labelId'), nullable=False)
 
-    def __init__(self, name, description, img, price, stock, markId):
+    def __init__(self, name, description, img, price, stock, producttypeId, markId, labelId):
         self.productName = name
         self.productDesc = description
         self.productImg = img
         self.productPrice = price
         self.productStock = stock
+        self.producttypeId = producttypeId
         self.markId = markId
+        self.labelId = labelId
 
     def save(self):
         db.session.add(self)
@@ -32,8 +36,10 @@ class ProductModel(db.Model):
             'precio' : self.productPrice,
             'stock' : self.productStock,
             'estado' : self.state,
-            'marca' : self.markId
+            'tipoproducto' : self.producttypeId,
+            'marca' : self.markId,
+            'etiqueta' : self.labelId
         }
 
     def __str__(self):
-        return '%s,%s,%s,%s,%s,%s,%s,%s'%(self.productId,self.productName,self.productDesc,self.productImg,self.productPrice,self.productStock,self.state,self.markId)
+        return '%s,%s,%s,%s,%s,%s,%s,%s,%s,%s'%(self.productId,self.productName,self.productDesc,self.productImg,self.productPrice,self.productStock,self.state,self.producttypeId,self.markId, self.labelId)

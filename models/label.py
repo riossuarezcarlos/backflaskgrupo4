@@ -6,6 +6,9 @@ class LabelModel(db.Model):
     labelDesc = db.Column(db.String(20))
     state = db.Column(db.Boolean, default=True)
 
+    products = db.relationship('ProductModel', backref='label')
+
+
     def __init__(self, description):
         self.labelDesc = description
 

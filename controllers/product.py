@@ -1,6 +1,18 @@
 from flask_restful import Resource, reqparse
+from flask import Flask, render_template, request
+from werkzeug.utils import secure_filename
+from werkzeug.datastructures import FileStorage
+
+import boto3
+
 from models.product import ProductModel
 
+s3 = boto3.client('s3',
+aws_access_key_id = 'AKIAJY3DK7BZYFXIHLFQ',
+aws_secret_access_key = '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'
+)
+
+ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png']
 BUCKET_NAME = 'imgflask'
 
 class ProductsController(Resource):
@@ -36,19 +48,29 @@ class ProductsController(Resource):
         help="productStock es obligatorio"
     )
     parser.add_argument(
+        "producttypeId",
+        type=int,
+        required=True,
+        help="producttypeId es obligatorio"
+    ) 
+    parser.add_argument(
         "markId",
         type=int,
         required=True,
         help="markId es obligatorio"
     )
+    parser.add_argument(
+        "labelId",
+        type=int,
+        required=True,
+        help="labelId es obligatorio"
+    )
 
     def get(self):
         products = ProductModel.query.all()
         listado = []
-        for product in products:
-            temporal = product.show()
-            temporal['marca'] = product.mark.show()
-            listado.append(temporal)
+        for product in products: 
+            listado.append(product.show())
 
         return{
             'ok' : True,
@@ -65,7 +87,9 @@ class ProductsController(Resource):
             data['productImg'],
             data['productPrice'],
             data['productStock'],
-            data['markId']
+            data['producttypeId'],
+            data['markId'],
+            data['labelId']
         )
         try:
             product.save()
@@ -84,11 +108,18 @@ class ProductsController(Resource):
 class ProductController(Resource):
     def get(self, productId):
         product = ProductModel.query.filter_by(productId=productId).first()
+
         if product:
+            listado = product.show()
+            listado['marcaDesc'] = product.mark.show()['descripcion']
+            listado['etiquetaDesc'] = product.label.show()['descripcion']
+            listado['tipoproductoDesc'] = product.producttype.show()['descripcion']
+            listado['subcategoria'] = product.producttype.show()['subcategoria']
+            listado['categoria'] = product.producttype.subcategory.show()['categoria']
             return{
                 'ok' : True,
                 'message' : None,
-                'content' : product.show()
+                'content' : listado
             }
         else:
             return{
@@ -132,10 +163,22 @@ class ProductController(Resource):
                 help="productStock es obligatorio"
             )
             parser.add_argument(
+                "producttypeId",
+                type=int,
+                required=True,
+                help="producttypeId es obligatorio"
+            ) 
+            parser.add_argument(
                 "markId",
                 type=int,
                 required=True,
                 help="markId es obligatorio"
+            )
+            parser.add_argument(
+                "labelId",
+                type=int,
+                required=True,
+                help="labelId es obligatorio"
             )
 
             data = parser.parse_args()
@@ -144,8 +187,10 @@ class ProductController(Resource):
             product.productDesc = data['productDesc']
             product.productImg = data['productImg']
             product.productPrice = data['productPrice']
-            product.productStock = data['productStock']
+            product.productStock = data['productStock'] 
+            product.producttypeId = data['producttypeId']
             product.markId = data['markId']
+            product.labelId = data['labelId']
             product.save()            
 
             return{
@@ -184,3 +229,27 @@ class ProductController(Resource):
                 'message' : 'No existe un producto con el id: ' + str(productId),
                 'content' : None
             }, 404
+
+class ProductImgController(Resource):
+    def post(self):
+        parse = reqparse.RequestParser()
+        parse.add_argument('file', type=FileStorage, location='files')
+        data = parse.parse_args()
+        print(data)
+        img = data['file']
+        
+        if img:
+            
+            filename = secure_filename(img.filename)
+            response = s3.upload_file(
+                Body=img,
+                Bucket = BUCKET_NAME,
+                Key = filename
+            ) 
+            print(response)
+            
+        return{
+            'ok' : True,
+            'message' : 'Upload Done'
+        }
+        

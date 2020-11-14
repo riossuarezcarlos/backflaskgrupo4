@@ -49,10 +49,12 @@ class ProductTypeController(Resource):
     def get(self, producttypeId):
         producttype = ProductTypeModel.query.filter_by(producttypeId = producttypeId).first()
         if producttype:
+            listado = producttype.show()
+            listado['categoria'] = producttype.subcategory.show()['categoria']
             return{
                 'ok': True,
                 'message': '',
-                'content': producttype.show()
+                'content': listado
             }
         else:
             return{

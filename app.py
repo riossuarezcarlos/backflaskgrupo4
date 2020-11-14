@@ -13,7 +13,7 @@ from models.product import ProductModel
 
 from controllers.label import LabelsController,LabelController
 from controllers.mark import MarksController, MarkController
-from controllers.product import ProductsController, ProductController
+from controllers.product import ProductsController, ProductController, ProductImgController
 
 from controllers.category import CategoriesController, CategoryController
 from controllers.subcategory import SubCategoriesController, SubCategoryController
@@ -47,6 +47,7 @@ api.add_resource(MarksController, '/mark')
 api.add_resource(MarkController, '/mark/<int:markId>')
 api.add_resource(ProductsController, '/product')
 api.add_resource(ProductController, '/product/<int:productId>')
+api.add_resource(ProductImgController, '/uploadimg')
 
 api.add_resource(CategoriesController, '/category')
 api.add_resource(CategoryController, '/category/<int:categoryId>')

@@ -42,16 +42,13 @@ class CategoriesController(Resource):
 class CategoryController(Resource):
     def get(self, categoryId):
         category = CategoryModel.query.filter_by(categoryId = categoryId).first()
-
-        listado = []    
-        subcategories = []
-        temporal = category.show()
-        for subcategory in category.subcategories:
-            subcategories.append(subcategory.show())
-        temporal['subcategorias'] = subcategories
-        listado.append(temporal)
  
         if category:
+            subcategories = []
+            listado = category.show()
+            for subcategory in category.subcategories:
+                subcategories.append(subcategory.show())
+            listado['subcategorias'] = subcategories
             return{
                 'ok': True,
                 'message': '',

@@ -48,14 +48,13 @@ class SubCategoriesController(Resource):
 class SubCategoryController(Resource):
     def get(self, subcategoryId):
         subcategory = SubCategoryModel.query.filter_by(subcategoryId = subcategoryId).first()
-
-        listado = []
-        temporal = subcategory.show()
-        temporal['categorias'] = subcategory.category.show()
-        listado.append(temporal)
-
-
+  
         if subcategory:
+            types = []
+            listado = subcategory.show()
+            for etype in subcategory.types:
+                types.append(etype.show())
+            listado['tipos'] = types
             return{
                 'ok': True,
                 'message': '',
