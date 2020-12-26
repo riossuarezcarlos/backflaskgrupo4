@@ -1,5 +1,10 @@
 from flask_restful import Resource, reqparse
 from models.product import ProductModel
+from firebaseconfig import firebaseAlmacenamiento
+from datetime import datetime
+from werkzeug.utils import secure_filename
+import os
+import werkzeug
 
 class ProductsController(Resource):
     parser = reqparse.RequestParser()
@@ -91,6 +96,40 @@ class ProductsController(Resource):
                 'content' : 'Ocurrio un error : ' + str(e)
             }, 500
 
+class ProductImage(Resource):
+    def __init__(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument("image", type=werkzeug.datastructures.FileStorage, location='files')
+        # Sending more info in the form? simply add additional arguments, with the location being 'form'
+        # parser.add_argument("other_arg", type=str, location='form')
+        self.req_parser = parser
+
+    def post(self):
+        try:
+            image = self.req_parser.parse_args(strict=True).get("image", None)
+            fecha = str(datetime.now().timestamp()).replace('.','')
+            nombreFinal = fecha + image.filename
+            nombre_seguro = secure_filename(nombreFinal)
+            image.save(nombre_seguro)
+            blobFirebase = firebaseAlmacenamiento.blob(nombre_seguro)
+            blobFirebase.upload_from_filename(nombre_seguro)
+            blobFirebase.make_public()
+            url = blobFirebase.public_url
+            os.remove(nombre_seguro)
+
+            return {
+                'ok': True,
+                'message': 'Se agregó la imagen correctamente',
+                'content': url
+            }
+        except:
+            return {
+                'ok': False,
+                'message': 'Ocurrió un error al agregar la imagen',
+                'content': None
+            }
+
+ 
 class ProductController(Resource):
     def get(self, productId):
         product = ProductModel.query.filter_by(productId=productId).first()
