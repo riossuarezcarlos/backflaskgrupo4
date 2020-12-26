@@ -254,3 +254,26 @@ class ProductController(Resource):
                 'message' : 'No existe un producto con el id: ' + str(productId),
                 'content' : None
             }, 404
+
+
+ 
+class ProductLabelController(Resource):
+    def get(self, labelId):
+        products = ProductModel.query.filter_by(labelId=labelId).limit(4).all()
+
+        if products:
+            listado = []
+            for prod in products:
+                listado.append(prod.show())
+            
+            return{
+                'ok': True,
+                'message': None,
+                'content': listado
+            }
+        else:
+            return{
+                'ok' : False,
+                'message' : 'No existes productos para esta etiqueta',
+                'content' : None
+            }, 404 
